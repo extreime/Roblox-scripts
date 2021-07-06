@@ -1,0 +1,105 @@
+local library = loadstring(game:HttpGet('https://raw.githubusercontent.com/loglizzy/Elerium-lib/main/lib.lua'))()
+
+getgenv().AutoFarm = false
+getgenv().IsAntiAFKEnabled = false
+
+local window = library:AddWindow('Gui for Elia', {
+    min_size = Vector2.new(350, 300),
+    toggle_key = Enum.KeyCode.RightShift,
+    can_resize = true
+})
+
+local Main = window:AddTab('Main')
+Main:Show()
+
+local a = game:GetService('VirtualUser')
+local Players = game:GetService('Players')
+local Player = Players.LocalPlayer
+local HttpService = game:GetService('HttpService')
+local TeleportService = game:GetService("TeleportService")
+
+
+local run = game:GetService('RunService'); run = run.RenderStepped or run.HeartBeat
+
+do -- Main Features
+
+ do --Switch 
+    local Switch = Main:AddSwitch('Auto Farm', function(bool)
+        getgenv().AutoFarm = bool
+
+        while getgenv().AutoFarm and run:wait() do
+            for i,v in next, player.Backpack:GetChildren() do
+                if v:IsA("Tool") then
+                   v.Parent = Character
+                    v:Activate()
+                    wait(.1)
+                    v:Deactivate()
+                end
+            end
+        
+            for i,v in next, Character:GetChildren() do
+                if v:IsA("Tool") then
+                    v.Parent = player.Backpack
+                end
+            end
+        end
+    end)
+    
+ end
+
+ do -- Buttons
+    local Button = Main:AddButton('Anti AFK', function()
+        if  not getgenv().IsAntiAFKEnabled then
+            while wait(5) do
+                a:ClickButton2(Vector2.new(), workspace.CurrentCamera.CFrame)
+            end
+        end
+    end)
+
+    local Button2 = Main:AddButton('Teleport Smallest Server', function()
+        local servers = HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/".. game.PlaceId.. "/servers/Public?sortOrder=Asc&limit=100"))
+
+        local lserver = nil
+        local lplrs = #game.Players:GetChildren()
+        local lpage = nil
+        
+        while true do
+            for i,v in pairs(servers.data) do
+                lpage = servers.nextPageCursor
+                
+                if v.playing then
+                    if v.playing <= lplrs then
+                        lserver = v.id
+                        lplrs = v.playing
+                    
+                        print('id:', lserver, 'players:', lplrs)
+                    end
+                end
+            end
+            
+            if lpage ~= nil and lpage ~= null then
+                warn('Searching in the next page', lpage)
+                servers = HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/'..game.PlaceId..'/servers/Public?sortOrder=Asc&limit=100&cursor='..lpage))
+            else
+                break
+            end
+        end
+    
+        warn('teleporting...')
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, lserver)
+    end)
+
+    local Button3 = Main:AddButton('Teleport To Safe Place', function()
+        Player.Character.HumanoidRootPart.CFrame = CFrame.new(155.623962, 2064.74219, 6368.29736, -0.936342478, 6.41395204e-08, 0.351087987, 6.64705126e-08, 1, -5.41275824e-09, -0.351087987, 1.82688016e-08, -0.936342478)
+    end)
+    local Button4 = Main:AddButton('Teleport Back', function()
+        Player.Character.HumanoidRootPart.CFrame = CFrame.new(-970.902222, 3196.25024, -1865.3562, 0.899690449, 1.18446524e-08, 0.436528444, -1.61485514e-09, 1, -2.38055105e-08, -0.436528444, 2.071266e-08, 0.899690449)
+    end)
+ end
+
+
+end
+
+
+
+        
