@@ -19,33 +19,36 @@ local HttpService = game:GetService('HttpService')
 local TeleportService = game:GetService("TeleportService")
 
 
-local run = game:GetService('RunService'); run = run.RenderStepped or run.HeartBeat
-
 do -- Main Features
 
  do --Switch 
     local Switch = Main:AddSwitch('Auto Farm', function(bool)
         getgenv().AutoFarm = bool
-
-        while getgenv().AutoFarm and run:wait() do
-            for i,v in next, player.Backpack:GetChildren() do
-                if v:IsA("Tool") then
-                   v.Parent = Character
-                    v:Activate()
-                    wait(.1)
-                    v:Deactivate()
+        print(bool)
+        
+        while getgenv().AutoFarm and wait() do
+            for i,v in next, Player.Backpack:GetChildren() do
+                 if v:IsA("Tool") then
+                    spawn(function() 
+                        v.Parent = Player.Character
+                        wait(.3)
+                    end)
                 end
             end
         
-            for i,v in next, Character:GetChildren() do
+            for i,v in next, Player.Character:GetChildren() do
                 if v:IsA("Tool") then
-                    v.Parent = player.Backpack
+                    spawn(function()
+                        v:Activate()
+                         wait(0.1)
+                        v:Deactivate()
+                        v.Parent = Player.Backpack
+                    end)
                 end
             end
-        end
+    end
     end)
-    
- end
+
 
  do -- Buttons
     local Button = Main:AddButton('Anti AFK', function()
@@ -99,7 +102,7 @@ do -- Main Features
 
 
 end
-
+end
 
 
         
